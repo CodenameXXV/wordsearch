@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Пошук слів · Word Search</title>
+<meta name="theme-color" content="#f6f7fc">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
@@ -18,7 +19,7 @@ body{margin:0;background:
   radial-gradient(900px 480px at 96% 2%,rgba(236,72,153,.10),transparent 60%),
   radial-gradient(1000px 560px at 50% 112%,rgba(16,185,129,.10),transparent 60%),
   var(--bg);color:var(--fg);font:16px/1.5 Inter,system-ui,Roboto,Arial,sans-serif;-webkit-font-smoothing:antialiased}
-.wrap{max-width:600px;margin:0 auto;padding:32px 16px 48px}
+.wrap{max-width:600px;margin:0 auto;padding:32px 16px calc(48px + env(safe-area-inset-bottom,0px))}
 h1{font-size:clamp(30px,7vw,40px);font-weight:800;text-align:center;margin:8px 0 14px;line-height:1.15;letter-spacing:-.02em}
 .grad{display:block;background:linear-gradient(120deg,#4f46e5,#9333ea 55%,#ec4899);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
 h1 .en{display:block;font-size:12px;font-weight:500;letter-spacing:4px;text-transform:uppercase;color:var(--mut);margin-top:7px}
@@ -57,14 +58,68 @@ button.p:hover{background:linear-gradient(135deg,#4338ca,#6d28d9);border-color:t
 #share small{color:var(--mut);display:block;margin-top:8px}
 .hide{display:none!important}
 footer{max-width:600px;margin:0 auto;padding:8px 16px 36px;text-align:center;color:var(--mut);font-size:14px}footer a{color:var(--blue);text-decoration:none;font-weight:500}footer a:hover{text-decoration:underline}
+/* Тумблер «Ефекти» */
+.switch{display:inline-flex;align-items:center;gap:10px;font-weight:500;color:var(--mut);cursor:pointer;user-select:none;-webkit-user-select:none;min-height:44px;font-size:14px}
+.switch input{position:absolute;opacity:0;width:1px;height:1px;pointer-events:none}
+.sw{position:relative;flex:none;width:46px;height:26px;border-radius:999px;background:#d3d6e0;box-shadow:inset 0 1px 3px rgba(17,24,39,.15);transition:background .2s}
+.sw::after{content:'';position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;box-shadow:0 2px 5px rgba(17,24,39,.3);transition:transform .2s cubic-bezier(.4,0,.2,1)}
+.switch input:checked~.sw{background:linear-gradient(135deg,#4f46e5,#7c3aed)}
+.switch input:checked~.sw::after{transform:translateX(20px)}
+.switch input:focus-visible~.sw{outline:2px solid var(--blue);outline-offset:2px}
 /* Ефект «рідини» (Canvas UI Liquid) — під контентом: малює лише на фоні
    сторінки, тому ніколи не перекриває слова та кнопки */
 #liquid{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:-1}
-@media (prefers-reduced-motion:reduce){#liquid{display:none}}
+/* Конфеті на перемогу */
+#confetti{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:60;display:none}
+/* Аркуш для друку (видний лише у прев'ю друку) */
+#sheet{display:none}
+@media print{
+  body>*{display:none!important}
+  #sheet{display:block!important;color:#000;background:#fff;font:12pt Arial,sans-serif}
+  #sheet .pt{font-size:20pt;font-weight:700;text-align:center;margin:0 0 6pt}
+  #sheet .pm{margin:0 0 12pt;text-align:center}
+  #sheet table{border-collapse:collapse;margin:0 auto 14pt}
+  #sheet td{border:1px solid #555;width:20pt;height:20pt;min-width:20pt;text-align:center;font-weight:700;padding:0}
+  #sheet .pw{column-count:3;column-gap:16pt;font-size:12pt}
+  #sheet .pw span{display:block;margin:0 0 4pt;break-inside:avoid}
+}
+/* Підсвітка підказки (перша літера слова) */
+.c.hint{background:#fef3c8!important;box-shadow:inset 0 0 0 3px #f59e0b;animation:hintPulse .7s ease-in-out infinite}
+@keyframes hintPulse{50%{box-shadow:inset 0 0 0 7px #fbbf24}}
+/* Зірочки-оцінка */
+.stars{color:#f59e0b;letter-spacing:2px;font-size:1.25em;white-space:nowrap}
+@media (prefers-reduced-motion:reduce){/* канвас вмикається із JS у спокійному режимі */}
+
+/* ── Мобільне верстування ── */
+@media (max-width:520px){
+  .wrap{padding-top:22px;padding-left:12px;padding-right:12px}
+  h1{margin-bottom:10px}
+  h1 .en{letter-spacing:3px}
+  .card{padding:16px;border-radius:16px}
+  textarea{min-height:140px;padding:10px 12px}
+  .row{gap:10px 12px;margin:12px 0}
+  .row label{flex:1 1 calc(50% - 6px);justify-content:space-between;min-height:44px}
+  .row select{flex:1 1 auto;max-width:60%}
+  .btns{flex-direction:column;align-items:stretch;gap:8px;margin-top:10px}
+  .btns button{width:100%;padding:13px 18px;font-size:15px} /* зручно тапати */
+  .join{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
+  .join input{width:100%;margin:0;flex:1 1 160px;min-height:44px}
+  .join button{flex:1 1 100px}
+  .bar{font-size:14px}
+  .c{cursor:default}
+  #words{gap:6px;margin-top:16px}
+  .w{padding:6px 12px;font-size:14px}
+  #share{padding:14px}
+  #share .r{flex-wrap:wrap}
+  #share .r input{min-width:140px}
+  #share .r button{padding:11px 16px}
+  footer{padding-bottom:20px}
+}
 </style>
 </head>
 <body>
 <canvas id="liquid" aria-hidden="true"></canvas>
+<canvas id="confetti" aria-hidden="true"></canvas>
 <div class="wrap">
   <h1 id="logo"><span class="grad">Пошук слів</span><span class="en">Word Search</span></h1>
 
@@ -77,13 +132,23 @@ footer{max-width:600px;margin:0 auto;padding:8px 16px 36px;text-align:center;col
         <label>Розмір поля
           <select id="size"><option value="0">Авто</option><option value="10">10×10</option><option value="12">12×12</option><option value="15">15×15</option><option value="18">18×18</option></select>
         </label>
-        <label>Складність <select id="lvl"><option value="0">Легко</option><option value="1" selected>Середньо</option><option value="2">Складно</option></select></label>
+        <label>Мова слів
+          <select id="lang"><option value="auto" selected>Авто</option><option value="uk">Українська</option><option value="en">English</option></select>
+        </label>
+        <label>Складність <select id="lvl"><option value="0">Легко</option><option value="3" selected>Середня</option><option value="2">Складно</option></select></label>
+        <label class="switch" title="Ефект рідини за курсором">
+          <input type="checkbox" id="fx" checked><span class="sw"></span>Ефекти
+        </label>
+        <label class="switch" title="Звукові ефекти">
+          <input type="checkbox" id="snd" checked><span class="sw"></span>Звук
+        </label>
         <span id="hint" style="flex-basis:100%;font-size:13px;color:var(--mut)"></span>
       </div>
       <div class="err" id="err"></div>
       <div class="btns">
         <button class="p" id="go">Створити гру</button>
         <button id="shset">Поділитися грою</button>
+        <button id="prn">Друк аркуша</button>
         <button id="demo">Приклад</button>
       </div>
     </div>
@@ -103,12 +168,17 @@ footer{max-width:600px;margin:0 auto;padding:8px 16px 36px;text-align:center;col
       <small>Учні відкривають посилання — і одразу грають. Або вставляють код на головній сторінці гри.</small>
     </div>
     <div class="btns" style="margin-top:22px">
+      <button class="p" id="hbtn">Підказка (3)</button>
       <button class="p" id="shbtn">Поділитися</button>
+      <button id="prng">Друк</button>
       <button id="shuf">Перемішати</button>
+      <button id="nxt" class="hide">Наступний рівень →</button>
       <button id="again">Нова гра</button>
     </div>
   </section>
 </div>
+
+<div id="sheet"></div>
 
 <footer>Автор: <a href="https://codenamexxv.github.io/teacher/" target="_blank" rel="noopener">Ігор Шуляк</a></footer>
 <script>
@@ -139,23 +209,46 @@ const dec=t=>{t=t.trim().replace(/^.*#/,'').replace(/-/g,'+').replace(/_/g,'/');
 const rng=a=>()=>{a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296};
 
 let cfg=null,words=[],G=[],N=0,found=0,sel=[],start=null,done=false,t0=0,timer=null;
+let level=1,runN=0,hints=3,hintsUsed=0,hintTimer=null;
 
-function parse(text){
+function parse(text,forced){
   const seen=new Set(),out=[];
   for(const raw of text.split(/[\n,;]+/)){
     const o=raw.trim();if(!o)continue;
-    const l=[...o.toLocaleUpperCase('uk')].filter(c=>/[\p{L}\p{N}]/u.test(c));
+    const l=letters(o,typeof wordLang==='function'?wordLang(o,forced):(forced&&forced!=='auto'?forced:'uk'));
     const k=l.join('');
     if(l.length<2||seen.has(k))continue;
     seen.add(k);out.push(o);
   }
   return out;
 }
-const letters=o=>[...o.toLocaleUpperCase('uk')].filter(c=>/[\p{L}\p{N}]/u.test(c));
+// Автовизначення мови слова: кирилиця → укр., латиниця → англ. (для цифр/змішаних — за перевагою)
+function wordLang(o,forced){
+  if(forced&&forced!=='auto')return forced;
+  const cyr=(o.match(/[а-яіїєґ]/gi)||[]).length,lat=(o.match(/[a-z]/gi)||[]).length;
+  return lat>cyr?'en':'uk';
+}
+// Мова списку для заголовка аркуша друку тощо
+function listLang(list,forced){
+  if(forced&&forced!=='auto')return forced;
+  let en=0;
+  for(const o of list)if(wordLang(o,forced)==='en')en++;
+  return en*2>=list.length?'en':'uk';
+}
+const letters=(o,lang)=>[...(lang==='en'?o.toUpperCase():o.toLocaleUpperCase('uk'))].filter(c=>(lang==='en'?/[A-Za-z0-9]/:/[\p{L}\p{N}]/u).test(c));
 
 function build(ws,rev,seed,size){
   const R=rng(seed);
-  const dirs=[[[0,1],[1,0]],[[0,1],[1,0],[1,1],[-1,1]],[[0,1],[1,0],[1,1],[-1,1],[0,-1],[-1,0],[-1,-1],[1,-1]]][rev];
+  const dirs=[[[0,1],[1,0]],[[0,1],[1,0],[1,1],[-1,1]],[[0,1],[1,0],[1,1],[-1,1],[0,-1],[-1,0],[-1,-1],[1,-1]],[[0,1],[1,0],[0,-1],[-1,0]]][rev];
+  const dg=dirs.filter(d=>d[0]&&d[1]); // діагональні напрямки
+  // У режимах з діагоналями (Складно й старе "Середньо") гарантовано розміщуємо
+  // ~35% слів діагонально — інакше випадковість кладе все прямолінійно
+  let diagTgt=null;
+  if(dg.length&&rev>=1){
+    diagTgt=new Set();
+    const cnt=Math.max(2,Math.round(ws.length*.35)),idx=ws.map((_,i)=>i);
+    for(let i=0;i<cnt&&idx.length;i++)diagTgt.add(ws[idx.splice(R()*idx.length|0,1)[0]]);
+  }
   const order=[...ws].sort((a,b)=>b.l.length-a.l.length);
   const pool=ws.flatMap(w=>w.l);
   const fs=new Set(ws.map(w=>w.l[0])),pe=pool.filter(ch=>!fs.has(ch)),fp=rev===0&&pe.length>3?pe:pool;
@@ -164,8 +257,9 @@ function build(ws,rev,seed,size){
     let ok=true;
     for(const w of order){
       const L=w.l.length;let placed=false;
+      const myDirs=diagTgt&&diagTgt.has(w)?dg.concat(dirs):dirs;
       for(let t=0;t<400&&!placed;t++){
-        const d=dirs[R()*dirs.length|0],r=R()*n|0,c=R()*n|0,er=r+d[0]*(L-1),ec=c+d[1]*(L-1);
+        const d=myDirs[R()*myDirs.length|0],r=R()*n|0,c=R()*n|0,er=r+d[0]*(L-1),ec=c+d[1]*(L-1);
         if(er<0||er>=n||ec<0||ec>=n)continue;
         let fit=true;
         for(let i=0;i<L;i++){const v=g[r+d[0]*i][c+d[1]*i];if(v&&v!==w.l[i]){fit=false;break}}
@@ -182,25 +276,37 @@ function build(ws,rev,seed,size){
 
 function startGame(c){
   const list=c.w.slice(0,30);
-  words=list.map(o=>({o,l:letters(o),f:false}));
+  const fL=(c.l&&c.l!=='auto')?c.l:null;
+  words=list.map(o=>({o,l:letters(o,wordLang(o,fL)),f:false}));
   const longest=Math.max(...words.map(w=>w.l.length));
   const total=words.reduce((s,w)=>s+w.l.length,0);
-  const lv0=c.d!=null?c.d:(c.r?2:1);
-  let size=c.n||Math.max([6,8,10][lv0],longest,Math.min(20,Math.ceil(Math.sqrt(total*[1.25,2,3][lv0]))));
+  const lv0=c.d!=null?c.d:(c.r?2:3);
+  let size=c.n||Math.max([6,8,10,8][lv0],longest,Math.min(20,Math.ceil(Math.sqrt(total*[1.25,2,3,2][lv0]))));
   size=Math.max(size,longest);
-  const lv=c.d!=null?c.d:(c.r?2:1);
+  const lv=c.d!=null?c.d:(c.r?2:3);
   G=build(words,lv,c.s,size);
   if(!G){$('#err').textContent='Не вдалося розмістити слова. Спробуйте більше поле.';return false}
-  cfg={w:list,d:lv,s:c.s,n:c.n||0};
+  cfg={w:list,d:lv,s:c.s,n:c.n||0,l:(c.l&&c.l!=='auto')?c.l:'auto'};
   N=G.length;found=0;done=false;sel=[];start=null;
   const grid=$('#grid');grid.style.gridTemplateColumns='repeat('+N+',1fr)';grid.style.setProperty('--n',N);grid.style.width='min(100%,'+Math.min(560,N*56)+'px)';
   grid.innerHTML=G.map((row,r)=>row.map((ch,c)=>'<div class="c" data-r="'+r+'" data-c="'+c+'">'+ch+'</div>').join('')).join('');
   $('#words').innerHTML=words.map((w,i)=>'<span class="w" id="w'+i+'">'+w.o.replace(/</g,'&lt;')+'</span>').join('');
   $('#tot').textContent=words.length;$('#cnt').textContent=0;
-  $('#win').style.display='none';$('#share').style.display='none';
+  $('#win').style.display='none';$('#share').style.display='none';$('#nxt').classList.add('hide');
+  document.querySelectorAll('.c.hint').forEach(e=>e.classList.remove('hint'));
+  if(hintTimer){clearTimeout(hintTimer);hintTimer=null}
+  hints=3;hintsUsed=0;updateHbtn();
   $('#setup').classList.add('hide');$('#game').classList.remove('hide');
   clearInterval(timer);t0=Date.now();tick();timer=setInterval(tick,1000);
   return true;
+}
+function updateHbtn(){const b=$('#hbtn');b.textContent='Підказка ('+hints+')';b.disabled=hints<=0||done}
+// Оцінка зірками: швидкість (сек/слово) і використані підказки
+function calcStars(secs,hintsUsed,nWords){
+  const per=secs/Math.max(nWords,1);
+  let s=per<=5?3:per<=10?2:1;
+  if(hintsUsed>0)s=Math.max(1,s-1);
+  return s;
 }
 function tick(){const s=Math.floor((Date.now()-t0)/1000);$('#time').textContent=Math.floor(s/60)+':'+String(s%60).padStart(2,'0')}
 
@@ -237,9 +343,16 @@ const end=()=>{
     const col=COL[i%COL.length];
     for(const [r,c] of sel){const el=grid.children[r*N+c];el.classList.add('f');el.style.background=col}
     $('#w'+i).classList.add('d');$('#cnt').textContent=found;
+    sfx('found');
     if(found===words.length){
-      done=true;clearInterval(timer);
-      const w=$('#win');w.textContent='Вітаємо! Усі слова знайдено за '+$('#time').textContent+' 🎉';w.style.display='block';
+      done=true;clearInterval(timer);updateHbtn();
+      const secs=Math.floor((Date.now()-t0)/1000);
+      const st=calcStars(secs,hintsUsed,words.length);
+      let msg='Вітаємо! Усі слова знайдено за '+$('#time').textContent+' <span class="stars">'+'★'.repeat(st)+'<span style="opacity:.25">'+'★'.repeat(3-st)+'</span></span>';
+      if(level>1)msg+=' · Рівень '+level+'/3';
+      const w=$('#win');w.innerHTML=msg;w.style.display='block';
+      sfx('win');confetti();
+      if(level<3)$('#nxt').classList.remove('hide');
     }
   }
   start=null;sel=[];paint();
@@ -249,10 +362,12 @@ grid.addEventListener('pointercancel',end);
 
 function show(){$('#game').classList.add('hide');$('#setup').classList.remove('hide');clearInterval(timer)}
 function create(){
-  const ws=parse($('#txt').value);
+  const lang=$('#lang').value;
+  const ws=parse($('#txt').value,lang);
   if(ws.length<2){$('#err').textContent='Додайте щонайменше два слова.';return}
   $('#err').textContent='';
-  startGame({w:ws,d:+$('#lvl').value,s:Math.floor(Math.random()*1e9),n:+$('#size').value});
+  level=1;runN=+$('#size').value;
+  startGame({w:ws,d:+$('#lvl').value,s:Math.floor(Math.random()*1e9),n:+$('#size').value,l:lang});
 }
 async function shareInfo(c,inGame){
   const code=await makeCode(c),base=location.href.split('#')[0];
@@ -265,30 +380,161 @@ async function copy(id,btn){
   const old=btn.textContent;btn.textContent=ok?'Скопійовано':'Виділено';setTimeout(()=>btn.textContent=old,1600);
 }
 async function joinCode(t){t=t.trim().replace(/^.*#/,'');if(/^\d{5}$/.test(t)){try{if(!DB_URL)throw 0;const d=await(await fetch(DB_URL.replace(/\/$/,'')+'/games/'+t+'.json')).json();if(!d||!d.c)throw 0;t=d.c}catch(_){$('#err').textContent='Гру з таким кодом не знайдено.';return false}}
-  try{const o=dec(t);if(!o||!Array.isArray(o.w)||o.w.length<2)throw 0;$('#txt').value=o.w.join('\n');$('#lvl').value=o.d!=null?o.d:(o.r?2:1);return startGame(o)}
+  try{const o=dec(t);if(!o||!Array.isArray(o.w)||o.w.length<2)throw 0;$('#txt').value=o.w.join('\n');$('#lvl').value=o.d!=null?o.d:(o.r?2:3);if(o.l==='uk'||o.l==='en'||o.l==='auto')$('#lang').value=o.l;level=1;runN=o.n||0;o.l=o.l||'auto';o.d=o.d!=null?o.d:(o.r?2:3);return startGame(o)}
   catch(_){$('#err').textContent='Код не підійшов. Перевірте, чи скопійовано його повністю.';return false}
 }
 
 const COL=['#fbbc04','#8ab4f8','#81c995','#f28b82','#d7aefb','#fdcfe8','#a1e4f0','#fcc934','#cbf0f8','#aecbfa'];
 
 $('#go').onclick=create;
-const H=['Слова йдуть зліва направо й зверху вниз. Зайві літери не збігаються з першими літерами слів. Поле компактне.','Додаються діагоналі. Поле середнє.','Слова можуть бути й навспак — у всіх 8 напрямках. Поле більше.'];
+const H=['Слова йдуть зліва направо й зверху вниз. Зайві літери не збігаються з першими літерами слів. Поле компактне.','Додаються діагоналі. Поле середнє.','Слова можуть бути й навспак — у всіх 8 напрямках. Поле більше.','Слова горизонтально, вертикально або навпаки — але без діагоналей. Поле середнє.'];
 $('#lvl').onchange=()=>{$('#hint').textContent=H[$('#lvl').value];$('#share').style.display='none'};
 $('#lvl').onchange();
 $('#size').onchange=$('#txt').oninput=()=>{$('#share').style.display='none'};
 $('#shset').onclick=()=>{
-  const ws=parse($('#txt').value);
+  const lang=$('#lang').value;
+  const ws=parse($('#txt').value,lang);
   if(ws.length<2){$('#err').textContent='Додайте щонайменше два слова.';return}
   $('#err').textContent='';
-  shareInfo({w:ws.slice(0,30),d:+$('#lvl').value,s:Math.floor(Math.random()*1e9),n:+$('#size').value},false);
+  shareInfo({w:ws.slice(0,30),d:+$('#lvl').value,s:Math.floor(Math.random()*1e9),n:+$('#size').value,l:lang},false);
 };
-$('#demo').onclick=()=>{$('#txt').value='яблуко\nгруша\nслива\nвишня\nабрикос\nмалина\nполуниця\nчорниця';$('#err').textContent=''};
-$('#join').onclick=()=>{const v=$('#code').value;if(v.trim())joinCode(v)};
+$('#demo').onclick=()=>{
+  const en=$('#lang').value==='en';
+  $('#txt').value=en
+    ?'apple\nbanana\ncherry\ngrape\nlemon\nmelon\nplum\npeach'
+    :'яблуко\nгруша\nслива\nвишня\nабрикос\nмалина\nполуниця\nчорниця';
+  $('#err').textContent='';
+};$('#join').onclick=()=>{const v=$('#code').value;if(v.trim())joinCode(v)};
 $('#shbtn').onclick=()=>shareInfo(cfg,true);
 $('#cp1').onclick=e=>copy('#lnk',e.target);
 $('#cp2').onclick=e=>copy('#cod',e.target);
 $('#shuf').onclick=()=>{startGame({...cfg,s:Math.floor(Math.random()*1e9)})};
-$('#again').onclick=()=>{$('#txt').value=cfg?cfg.w.join('\n'):$('#txt').value;try{history.replaceState(null,'',location.href.split('#')[0])}catch(_){}show()};
+$('#again').onclick=()=>{$('#txt').value=cfg?cfg.w.join('\n'):$('#txt').value;try{history.replaceState(null,'',location.href.split('#')[0])}catch(_){}level=1;show()};
+
+// ── Рівні-чекпойнти: 3 підряд гри з наростанням розміру поля ──
+$('#nxt').onclick=()=>{
+  if(!cfg)return;
+  level=Math.min(3,level+1);
+  const forced=[10,12,15][level-1];
+  startGame({w:cfg.w,d:cfg.d,s:Math.floor(Math.random()*1e9),n:Math.max(runN,forced),l:cfg.l});
+};
+
+// ── Підказка: підсвічує першу літеру випадкового незнайденого слова ──
+function findWordStart(w){
+  const dirs=[[0,1],[1,0],[1,1],[-1,1],[0,-1],[-1,0],[-1,-1],[1,-1]];
+  for(let r=0;r<N;r++)for(let c=0;c<N;c++){
+    if(G[r][c]!==w.l[0])continue;
+    for(const d of dirs){
+      let ok=true;
+      for(let i=0;i<w.l.length;i++){
+        const rr=r+d[0]*i,cc=c+d[1]*i;
+        if(rr<0||rr>=N||cc<0||cc>=N||G[rr][cc]!==w.l[i]){ok=false;break}
+      }
+      if(ok)return[r,c];
+    }
+  }
+  return null;
+}
+$('#hbtn').onclick=()=>{
+  if(done||hints<=0)return;
+  const pending=words.map((w,i)=>({w,i})).filter(x=>!x.w.f);
+  if(!pending.length)return;
+  const pick=pending[Math.floor(Math.random()*pending.length)];
+  const pos=findWordStart(pick.w);
+  if(!pos)return;
+  hints--;hintsUsed++;updateHbtn();sfx('hint');
+  const el=grid.children[pos[0]*N+pos[1]];
+  el.classList.remove('hint');void el.offsetWidth;el.classList.add('hint');
+  if(hintTimer)clearTimeout(hintTimer);
+  hintTimer=setTimeout(()=>{el.classList.remove('hint');hintTimer=null},2500);
+};
+
+// ── Звук: короткі синтезовані сигнали (WebAudio) ──
+let AC=null;
+function sndOff(){try{return localStorage.getItem('ws-sound-off')==='1'}catch(_){return false}}
+function tone(f,t0,dur,type,gain){
+  AC=AC||new(window.AudioContext||window.webkitAudioContext)();
+  if(AC.state==='suspended')AC.resume();
+  const o=AC.createOscillator(),g=AC.createGain(),t=AC.currentTime+t0;
+  o.type=type||'sine';o.frequency.value=f;
+  g.gain.setValueAtTime(gain||.15,t);
+  g.gain.exponentialRampToValueAtTime(.001,t+dur);
+  o.connect(g);g.connect(AC.destination);
+  o.start(t);o.stop(t+dur+.05);
+}
+function sfx(kind){
+  if(sndOff())return;
+  try{
+    if(kind==='found'){tone(520,0,.1);tone(740,.07,.14)}
+    else if(kind==='hint'){tone(1150,0,.09,'sine',.1)}
+    else if(kind==='win'){[523,659,784,1047].forEach((f,i)=>tone(f,i*.13,.3,'triangle',.13))}
+  }catch(_){}
+}
+(function(){
+  const cb=$('#snd');
+  cb.checked=!sndOff();
+  cb.onchange=()=>{try{localStorage.setItem('ws-sound-off',cb.checked?'0':'1')}catch(_){}};
+})();
+
+// ── Конфеті на перемогу (кольори — як підсвітки знахідок) ──
+function confetti(){
+  const cvs=$('#confetti');
+  if(!cvs||fxOff())return; // гравець вимкнув анімації — конфеті теж не показуємо
+  const reduce=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const dpr=Math.min(window.devicePixelRatio||1,2);
+  const W=innerWidth,H=innerHeight;
+  cvs.width=Math.round(W*dpr);cvs.height=Math.round(H*dpr);
+  cvs.style.display='block';
+  const ctx=cvs.getContext('2d');
+  const COLS=['#4f46e5','#7c3aed','#ec4899','#f59e0b','#10b981','#3b82f6','#ef4444','#fbbc04','#81c995'];
+  const P=Array.from({length:reduce?40:150},()=>({
+    x:Math.random()*W,y:-20-Math.random()*H*.4,
+    vx:(Math.random()-.5)*2.2,vy:2+Math.random()*3.5,
+    s:5+Math.random()*7,c:COLS[Math.random()*COLS.length|0],
+    r:Math.random()*Math.PI,vr:(Math.random()-.5)*.25
+  }));
+  let f=0,maxF=reduce?90:180;
+  (function frame(){
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+    ctx.clearRect(0,0,W,H);
+    for(const p of P){
+      p.x+=p.vx;p.y+=p.vy;p.vy+=.04;p.r+=p.vr;
+      ctx.save();ctx.translate(p.x,p.y);ctx.rotate(p.r);ctx.fillStyle=p.c;
+      ctx.fillRect(-p.s/2,-p.s/2,p.s,p.s*.6);ctx.restore();
+    }
+    if(++f<maxF&&P[P.length-1].y<H+40)requestAnimationFrame(frame);
+    else cvs.style.display='none';
+  })();
+}
+
+// ── Друкований аркуш: чиста сітка без підсвіток + поле для імені ──
+const esc2=s=>s.replace(/</g,'&lt;').replace(/&/g,'&amp;');
+function sheetFor(g,ws,lang){
+  const en=lang==='en';
+  $('#sheet').innerHTML=
+    '<div class="pt">'+(en?'Word Search':'Пошук слів')+'</div>'+
+    (en
+      ?'<div class="pm">Name: ______________________ &nbsp; Class: _________ &nbsp; Date: ____________</div>'
+      :'<div class="pm">Ім\'я: ______________________ &nbsp; Клас: _________ &nbsp; Дата: ____________</div>')+
+    '<table>'+g.map(row=>'<tr>'+row.map(ch=>'<td>'+esc2(ch)+'</td>').join('')+'</tr>').join('')+'</table>'+
+    '<div class="pw">'+ws.map(w=>'<span>'+esc2(w.o)+'</span>').join('')+'</div>';
+  window.print();
+}
+$('#prng').onclick=()=>{if(G)sheetFor(G,words,listLang(words.map(w=>w.o),cfg?cfg.l:'auto'))};
+$('#prn').onclick=()=>{
+  $('#err').textContent='';
+  const lang=$('#lang').value;
+  const ws=parse($('#txt').value,lang);
+  if(ws.length<2){$('#err').textContent='Додайте щонайменше два слова — і друкуйте аркуш.';return}
+  const wsL=ws.map(o=>({o,l:letters(o,wordLang(o,lang))}));
+  const lv=+$('#lvl').value;
+  const total=wsL.reduce((s,w)=>s+w.l.length,0);
+  const longest=Math.max(...wsL.map(w=>w.l.length));
+  let size=Math.max([6,8,10,8][lv],longest,Math.min(20,Math.ceil(Math.sqrt(total*[1.25,2,3,2][lv]))));
+  const g=build(wsL,lv,Math.floor(Math.random()*1e9),size);
+  if(!g){$('#err').textContent='Не вдалося розмістити слова на аркуші. Спробуйте менше слів.';return}
+  sheetFor(g,wsL,listLang(ws,lang));
+};
 
 // відкриття за посиланням
 function fromHash(){const h=location.hash.slice(1);if(h.length>8||/^\d{5}$/.test(h))joinCode(h)}
@@ -479,8 +725,7 @@ void main () {
 }`;
 
 function createLiquid(output,options){
-  const config=Object.assign({},LIQUID_DEFAULTS,options);
-  const gl=output.getContext('webgl2',{alpha:true,depth:false,stencil:false,antialias:false,premultipliedAlpha:true});
+  const config=Object.assign({},LIQUID_DEFAULTS,options);  const gl=output.getContext('webgl2',{alpha:true,depth:false,stencil:false,antialias:false,premultipliedAlpha:true});
   if(!gl||gl.isContextLost())return null;
   const supportsFloatTargets=Boolean(gl.getExtension('EXT_color_buffer_float')||gl.getExtension('EXT_color_buffer_half_float'));
   if(!supportsFloatTargets)return null;
@@ -737,8 +982,8 @@ function createLiquid(output,options){
   start();
 
   const motionQuery=window.matchMedia('(prefers-reduced-motion: reduce)');
-  let reducedMotion=motionQuery.matches;
-  function onMotionChange(){reducedMotion=motionQuery.matches;if(!reducedMotion)start()}
+  let reducedMotion=config.forceMotion?false:motionQuery.matches;
+  function onMotionChange(){if(!config.forceMotion)reducedMotion=motionQuery.matches;if(!reducedMotion)start()}
   motionQuery.addEventListener('change',onMotionChange);
 
   const pointers=new Map();
@@ -834,18 +1079,46 @@ function createLiquid(output,options){
 }
 
 // ── Ініціалізація ефекту: легкі напівпрозорі сліди рідини за курсором ──
-// Слаbi, щоб лише прикрасити: невелика насиченість (intensity) і тонкий радіус,
-// щоб ефект не перекривав слова на полі.
-try{
+// Шар #liquid малюється під контентом, тому слова він не перекриває.
+// Кнопка "Вимкнути ефекти" у підвалі збережує вибір у localStorage.
+let liquidInstance=null;
+const FX_KEY='ws-effects-off';
+
+function effectParams(){
+  const forceMotion=/motion=1/.test(location.search); // ?motion=1 — повна сила
+  const reduceMotion=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const calm=reduceMotion&&!forceMotion;
+  // Режим доступності: сліди повільніші й блідіші.
+  return calm
+    ?{rainbow:true,intensity:.26,radius:.1, force:.7, distortion:.05,densityDissipation:.97,forceMotion:true}
+    :{rainbow:true,intensity:.45,radius:.14,force:1.1,distortion:.2, densityDissipation:.965,forceMotion:forceMotion||false};
+}
+function startLiquid(){
   const out=document.getElementById('liquid');
-  if(!out){console.warn('Liquid: не знайдено елемент #liquid')}
-  else if(window.matchMedia('(prefers-reduced-motion: reduce)').matches){
-    console.info('Liquid: ефект вимкнено — у системі/браузері ввімкнено "prefers-reduced-motion" (зменшення руху).');
-  }else{
-    const inst=createLiquid(out,{rainbow:true,intensity:.65,radius:.18,force:1.1,distortion:.2,densityDissipation:.965});
-    if(!inst)console.info('Liquid: браузер не має WebGL2 + float-текстур — ефект вимкнено.');
-  }
-}catch(e){console.warn('Liquid: помилка запуску ефекту',e)}
+  try{
+    if(!out){console.warn('Liquid: не знайдено елемент #liquid');return}
+    out.style.display='block';
+    liquidInstance=createLiquid(out,effectParams());
+    if(!liquidInstance)console.info('Liquid: браузер не має WebGL2 + float-текстур — ефект вимкнено.');
+  }catch(e){console.warn('Liquid: помилка запуску ефекту',e)}
+}
+function stopLiquid(){
+  try{if(liquidInstance){liquidInstance.destroy();liquidInstance=null}}catch(_){}
+  const out=document.getElementById('liquid');
+  if(out)out.style.display='none';
+}
+function fxOff(){try{return localStorage.getItem(FX_KEY)==='1'}catch(_){return false}}
+function applyFx(){
+  const cb=document.getElementById('fx');
+  if(fxOff()){stopLiquid();if(cb)cb.checked=false}
+  else{if(!liquidInstance)startLiquid();if(cb)cb.checked=true}
+}
+applyFx();
+if(typeof $!=='undefined'){
+  const cb=$('#fx');
+  cb.checked=!fxOff();
+  cb.onchange=()=>{try{localStorage.setItem(FX_KEY,cb.checked?'0':'1')}catch(_){}applyFx()};
+}
 </script>
 </body>
 </html>
